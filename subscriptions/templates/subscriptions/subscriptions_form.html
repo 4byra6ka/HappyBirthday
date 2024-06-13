@@ -1,0 +1,29 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="form-signin w-100 m-auto">
+        <form method="post">
+            {% csrf_token %}
+            <img class="mb-4" src="{% static 'HappyBirthday.svg' %}" alt="">
+            {% if object %}
+                <h1 class="h3 mb-3 fw-normal">Изменить данные подписки {{ object.birthday_person }}</h1>
+            {% else %}
+                <h1 class="h3 mb-3 fw-normal">Подписка на сотрудника {{ birthday_person.first_name }} {{ birthday_person.last_name }}</h1>
+            {% endif %}
+            {{ form.non_field_errors }}
+            {{ form.notification.errors }}
+
+            <div class="form-floating">
+                {{ form.notification }}
+                <label for="{{ form.notification.id_for_label }}">Дата/Время оповещения</label>
+            </div>
+
+            {% if object %}
+                <button class="btn btn-warning w-100 py-2" type="submit">Изменить</button>
+            {% else %}
+                <button class="btn btn-primary w-100 py-2" type="submit">Добавить</button>
+            {% endif %}
+
+        </form>
+    </main>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Сотрудники</h1>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start m-1">
+                <form method="post">
+                    {% csrf_token %}
+                    <fieldset class="uk-fieldset">
+                        <h3 class="h5">
+                            Удалить сотрудника {{ object.first_name }} {{ object.last_name }}?
+                            <button class="btn btn-outline-danger btn-lg px-4 me-md-2">
+                                Удалить
+                            </button>
+                        </h3>
+
+                    </fieldset>
+                </form>
+            </div>
+{#            {% if user.is_staff %}#}
+{#                <a class="btn btn-outline-warning btn-lg px-4 me-md-2" href="{% url 'employees:create' %}">Добавить#}
+{#                    сотрудника</a>#}
+{#            {% endif %}#}
+        </div>
+
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Фамилия</th>
+                    <th scope="col">Дата рождения</th>
+                    <th scope="col">Почта</th>
+                    <th scope="col">Телеграмм</th>
+                    <th scope="col"></th>
+                    {% if user.is_staff %}
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <td>{{ object.pk }}</td>
+                        <td>{{ object.first_name }}</td>
+                        <td>{{ object.last_name }}</td>
+                        <td>{{ object.birthday }}</td>
+                        <td>{{ object.email }}</td>
+                        <td>{% if object.telegram %}{{ object.telegram }}{% else %}Неуказан{% endif %}</td>
+                        {% if object.owner != user %}
+                            <td><a href="{% url 'main:main' %}"><span
+                                    class="badge text-bg-success">Подписаться</span></a></td>
+                        {% else %}
+                            <td><span class="badge text-bg-info">Вы</span></td>
+                        {% endif %}
+                        {% if user.is_staff %}
+                            <td><a href="{% url 'employees:update' object.pk %}"><span
+                                    class="badge text-bg-warning">Изменить</span></a></td>
+                            <td><a href="{% url 'employees:delete' object.pk %}"><span
+                                    class="badge text-bg-danger">Удалить</span></a></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock %}

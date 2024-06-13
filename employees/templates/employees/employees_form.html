@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="form-signin w-100 m-auto">
+        <form method="post">
+            {% csrf_token %}
+            <img class="mb-4" src="{% static 'HappyBirthday.svg' %}" alt="">
+            {% if object %}
+                <h1 class="h3 mb-3 fw-normal">Изменить данные сотрудника</h1>
+            {% else %}
+                <h1 class="h3 mb-3 fw-normal">Добавить сотрудника</h1>
+            {% endif %}
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {{ form.non_field_errors }}
+            {{ form.email.errors }}
+            {{ form.first_name.errors }}
+            {{ form.last_name.errors }}
+            {{ form.birthday.errors }}
+            {{ form.telegram.errors }}
+            <div class="form-floating">
+                {{ form.first_name }}
+                <label for="{{ form.first_name.id_for_label }}">Имя</label>
+            </div>
+            <div class="form-floating">
+                {{ form.last_name }}
+                <label for="{{ form.last_name.id_for_label }}">Фамилия</label>
+            </div>
+            <div id="datepicker" class="form-floating">
+                {{ form.birthday }}
+                <label for="{{ form.birthday.id_for_label }}">Дата рождения</label>
+            </div>
+            <div class="form-floating">
+                {{ form.email }}
+                <label for="{{ form.email.id_for_label }}">Почта</label>
+            </div>
+            <div class="form-floating">
+                {{ form.telegram }}
+                <label for="{{ form.telegram.id_for_label }}">Телеграмм</label>
+            </div>
+            {% if object %}
+                <button class="btn btn-warning w-100 py-2" type="submit">Изменить</button>
+            {% else %}
+                <button class="btn btn-primary w-100 py-2" type="submit">Добавить</button>
+            {% endif %}
+
+        </form>
+    </main>
+{% endblock %}

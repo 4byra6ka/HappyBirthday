@@ -43,10 +43,12 @@ class UserProfileForm(UserChangeForm):
         attrs={'placeholder': "DD/MM/YYYY", 'class': 'form-control', 'type': 'birthday'}))
     telegram = forms.IntegerField(label='Фамилия', widget=forms.NumberInput(
         attrs={'placeholder': "", 'class': 'form-control', 'type': 'telegram'}), required=False)
+    is_staff = forms.BooleanField(label='Модератор', widget=forms.CheckboxInput(
+        attrs={ 'class': 'form-check-input', 'type': 'checkbox'}), required=False)
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'birthday', 'telegram')
+        fields = ('email', 'first_name', 'last_name', 'birthday', 'telegram', 'is_staff')
 
 
 class UserRecoveryPasswordForm(forms.Form):

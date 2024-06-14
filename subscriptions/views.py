@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 
@@ -8,8 +9,9 @@ from subscriptions.models import Subscriptions
 from subscriptions.services import create_periodic_task
 
 
-class SubscriptionsListView(ListView):
+class SubscriptionsListView(LoginRequiredMixin, ListView):
     """Просмотр рассылок"""
+    login_url = "/users/"
     model = Subscriptions
     extra_context = {
         'title': 'Подписки на ДР'
@@ -20,12 +22,13 @@ class SubscriptionsListView(ListView):
         if self.request.user.is_staff:
             context['object_list'] = Subscriptions.objects.all()
         else:
-            context['object_list'] = Subscriptions.objects.filter(employees= self.request.user)
+            context['object_list'] = Subscriptions.objects.filter(employees=self.request.user)
         return context
 
 
 class SubscriptionsCreateView(LoginRequiredMixin, CreateView):
     """Создание рассылки"""
+    login_url = "/users/"
     model = Subscriptions
     extra_context = {
         'title': 'Подписаться'
@@ -51,6 +54,7 @@ class SubscriptionsCreateView(LoginRequiredMixin, CreateView):
 
 class SubscriptionsUpdateView(LoginRequiredMixin, UpdateView):
     """Обновление рассылки"""
+    login_url = "/users/"
     model = Subscriptions
     form_class = SubscriptionsCreateForm
 
@@ -60,8 +64,11 @@ class SubscriptionsUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['title'] = f'Изменение подписки {context['object'].birthday_person}'
+        if self.request.user == self.object.employees:
+            context = super().get_context_data(*args, **kwargs)
+            context['title'] = f'Изменение подписки {context['object'].birthday_person}'
+        else:
+            raise PermissionDenied()
         return context
 
     def get_success_url(self):
@@ -70,6 +77,7 @@ class SubscriptionsUpdateView(LoginRequiredMixin, UpdateView):
 
 class SubscriptionsDeleteView(LoginRequiredMixin, DeleteView):
     """Удаление рассылки"""
+    login_url = "/users/"
     model = Subscriptions
     success_url = reverse_lazy('subscriptions:list')
 
@@ -78,10 +86,13 @@ class SubscriptionsDeleteView(LoginRequiredMixin, DeleteView):
         return super().form_valid(form)
 
     def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['title'] = f'Отписаться от рассылки {context['object'].birthday_person}'
-        if self.request.user.is_staff:
-            context['object_list'] = Subscriptions.objects.all()
+        if self.request.user == self.object.employees:
+            context = super().get_context_data(*args, **kwargs)
+            context['title'] = f'Отписаться от рассылки {context['object'].birthday_person}'
+            if self.request.user.is_staff:
+                context['object_list'] = Subscriptions.objects.all()
+            else:
+                context['object_list'] = Subscriptions.objects.filter(employees=self.request.user)
         else:
-            context['object_list'] = Subscriptions.objects.filter(employees=self.request.user)
+            raise PermissionDenied()
         return context

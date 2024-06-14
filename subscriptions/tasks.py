@@ -17,12 +17,3 @@ def send_notification(**kwargs):
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[subscription.employees.email]
     )
-    subscription.delete()
-
-
-@shared_task(queue='queue1')
-def send_test():
-    """Отправка уведомления о ДР"""
-    subscription = Subscriptions.objects.get(pk=7)
-    print(111)
-    subscription.delete()

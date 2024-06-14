@@ -1,5 +1,6 @@
 {% extends 'main/base.html' %}
 {% load static %}
+{% load employees_tags %}
 {% block content %}
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -18,10 +19,6 @@
                     </fieldset>
                 </form>
             </div>
-{#            {% if user.is_staff %}#}
-{#                <a class="btn btn-outline-warning btn-lg px-4 me-md-2" href="{% url 'employees:create' %}">Добавить#}
-{#                    сотрудника</a>#}
-{#            {% endif %}#}
         </div>
 
         <div class="table-responsive small mt-2">
@@ -34,7 +31,9 @@
                     <th scope="col">Дата рождения</th>
                     <th scope="col">Почта</th>
                     <th scope="col">Телеграмм</th>
-                    <th scope="col"></th>
+                    {% if user.is_authenticated %}
+                        <th scope="col"></th>
+                    {% endif %}
                     {% if user.is_staff %}
                         <th scope="col"></th>
                         <th scope="col"></th>
@@ -50,11 +49,19 @@
                         <td>{{ object.birthday }}</td>
                         <td>{{ object.email }}</td>
                         <td>{% if object.telegram %}{{ object.telegram }}{% else %}Неуказан{% endif %}</td>
-                        {% if object.owner != user %}
-                            <td><a href="{% url 'main:main' %}"><span
-                                    class="badge text-bg-success">Подписаться</span></a></td>
-                        {% else %}
-                            <td><span class="badge text-bg-info">Вы</span></td>
+                        {% if user.is_authenticated %}
+                            {% if object.owner != user %}
+                                {% subscriptions_check object=object user=user as sub_check %}
+                                {% if sub_check %}
+                                    <td><a href="{% url 'subscriptions:delete' sub_pk %}"><span
+                                            class="badge text-bg-danger">Отписаться</span></a></td>
+                                {% else %}
+                                    <td><a href="{% url 'subscriptions:create' object.pk %}"><span
+                                            class="badge text-bg-success">Подписаться</span></a></td>
+                                {% endif %}
+                            {% else %}
+                                <td><span class="badge text-bg-info">Вы</span></td>
+                            {% endif %}
                         {% endif %}
                         {% if user.is_staff %}
                             <td><a href="{% url 'employees:update' object.pk %}"><span

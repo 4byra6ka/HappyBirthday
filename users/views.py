@@ -1,11 +1,9 @@
 import uuid
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import UpdateView, FormView, CreateView
@@ -13,6 +11,7 @@ from django.views.generic import UpdateView, FormView, CreateView
 from employees.models import Employees
 from users.forms import UserRegisterForm, UserProfileForm, UserRecoveryPasswordForm, UserLoginForm
 from users.models import User
+from users.tasks import send_notification_users
 
 
 class CustomLoginView(FormView):
@@ -66,10 +65,10 @@ class RegisterView(CreateView):
             self.object.register_uuid = uuid.uuid4().hex
             self.object.save()
             current_site = get_current_site(self.request)
-            send_mail(
+            send_notification_users.delay(
                 subject='Верификация пользователя',
-                message=f'Верификация пользователя пройдите по ссылке http://{current_site}{reverse_lazy("users:success_register", kwargs={"register_uuid": self.object.register_uuid})}',
-                from_email=settings.EMAIL_HOST_USER,
+                message=f'Верификация пользователя пройдите по ссылке http://{current_site}{reverse_lazy(
+                    "users:success_register", kwargs={"register_uuid": self.object.register_uuid})}',
                 recipient_list=[self.object.email]
             )
             return super().form_valid(form)
@@ -139,10 +138,9 @@ class RecoveryPasswordView(FormView):
                 password = User.objects.make_random_password()
                 recovery_user.set_password(password)
                 recovery_user.save()
-                send_mail(
+                send_notification_users.delay(
                     subject='Новый пароль',
                     message=f'Ваш новый пароль: {password}',
-                    from_email=settings.EMAIL_HOST_USER,
                     recipient_list=[recovery_user.email]
                 )
                 return super().form_valid(form, *args, **kwargs)

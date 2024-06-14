@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: web.Dockerfile
+    container_name: web
+    volumes:
+      - static_volume:/app/staticfiles
+    expose:
+      - 8000
+    env_file:
+      - ./.env.dev
+  db:
+    image: postgres:15-alpine
+    container_name: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: happy_birthday
+    ports:
+      - 5432
+  redis:
+    image: redis:7.0.5-alpine
+    container_name: redis
+    expose:
+      - 6379
+  proxy:
+    restart: always
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    container_name: proxy
+    ports:
+      - 8080:80
+    volumes:
+      - static_volume:/app/staticfiles
+    depends_on:
+      - web
+  celery:
+    build:
+      context: .
+      dockerfile: celery.Dockerfile
+    command: celery -A config worker -l INFO
+    container_name: celery
+    depends_on:
+      - web
+    env_file:
+      - ./.env.dev
+  celery-beat:
+    build:
+      context: .
+      dockerfile: celery-beat.Dockerfile
+    container_name: celery-beat
+    depends_on:
+      - web
+    env_file:
+      - ./.env.dev
+
+volumes:
+  postgres_data:
+  static_volume:

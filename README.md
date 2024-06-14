@@ -18,6 +18,8 @@
 * Установить PostgreSQL на сервер или ПК и предварительно настроить БД.
 * Установить БД Redis `sudo apt install redis`.
 * Создать файл `.evn` для передачи личных данных в Django настройки.
+
+
     EMAIL_HOST_USER=<Почта>
     EMAIL_HOST_PASSWORD=<Пароль>
     ALLOWED_HOSTS=<*>
@@ -34,6 +36,8 @@
 
 
 ### Разворачивание проекта "Сервис для поздравлений с днем рождения"
+
+
     git clone https://github.com/4byra6ka/HappyBirthday.git
     cd HappyBirthday
     poetry install
@@ -43,9 +47,12 @@
     celery -A config worker -l INFO
     celery -A config beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
+
 ***
 ### Также можно запустить через Docker:
 * Нужно подправить файл `.evn.dev` и поля `EMAIL_HOST_USER`,`EMAIL_HOST_PASSWORD`,`CSRF_TRUSTED_ORIGINS`.
+
+
     EMAIL_HOST_USER=<Почта>
     EMAIL_HOST_PASSWORD=<Пароль>
     ALLOWED_HOSTS=*

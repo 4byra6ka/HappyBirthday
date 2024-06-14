@@ -18,7 +18,7 @@
 * Установить PostgreSQL на сервер или ПК и предварительно настроить БД.
 * Установить БД Redis `sudo apt install redis`.
 * Создать файл `.evn` для передачи личных данных в Django настройки.
-
+***
 
     EMAIL_HOST_USER=<Почта>
     EMAIL_HOST_PASSWORD=<Пароль>
@@ -51,7 +51,7 @@
 ***
 ### Также можно запустить через Docker:
 * Нужно подправить файл `.evn.dev` и поля `EMAIL_HOST_USER`,`EMAIL_HOST_PASSWORD`,`CSRF_TRUSTED_ORIGINS`.
-###
+***
 
 
     EMAIL_HOST_USER=<Почта>

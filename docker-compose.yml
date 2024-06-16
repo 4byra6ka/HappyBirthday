@@ -14,6 +14,7 @@ services:
     env_file:
       - ./.env.dev
   db:
+    restart: always
     image: postgres:15-alpine
     container_name: db
     volumes:
@@ -42,6 +43,7 @@ services:
     depends_on:
       - web
   celery:
+    restart: always
     build:
       context: .
       dockerfile: celery.Dockerfile
@@ -52,6 +54,7 @@ services:
     env_file:
       - ./.env.dev
   celery-beat:
+    restart: always
     build:
       context: .
       dockerfile: celery-beat.Dockerfile

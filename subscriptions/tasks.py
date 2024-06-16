@@ -13,7 +13,7 @@ def send_notification(**kwargs):
         subject=f'Оповещение о дне рождении {subscription.birthday_person.first_name} '
                 f'{subscription.birthday_person.first_name}',
         message=f'{subscription.birthday_person.birthday} день рождения у {subscription.birthday_person.first_name} '
-                f'{subscription.birthday_person.first_name} не забудь поздравить',
+                f'{subscription.birthday_person.last_name} не забудь поздравить',
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[subscription.employees.email]
     )

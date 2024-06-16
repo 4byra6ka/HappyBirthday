@@ -40,6 +40,7 @@
 
     git clone https://github.com/4byra6ka/HappyBirthday.git
     cd HappyBirthday
+    nano env.dev
     poetry install
     python manage.py makemigrations
     python manage.py migrate
